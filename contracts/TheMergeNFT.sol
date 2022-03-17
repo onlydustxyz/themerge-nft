@@ -26,10 +26,12 @@ contract TheMergeNFT is ERC721URIStorage {
 
     /// @dev Mint an NFT if whitelisted.
     /// @param merkleProof_ Merkle proof.
-    function whitelistMint(bytes32[] calldata merkleProof_) external returns (uint256) {
+    function whitelistMint(bytes32 nftType_, bytes32[] calldata merkleProof_) external returns (uint256) {
         // Ensure wallet hasn't already claimed.
         require(!whitelistClaimed[msg.sender], "Address has already claimed.");
-        bytes32 leaf = keccak256(abi.encodePacked(msg.sender));
+        bytes memory data = abi.encodePacked(msg.sender, nftType_);
+        bytes32 leaf = keccak256(data);
+
         // Verify the provider merkle proof.
         require(MerkleProof.verify(merkleProof_, merkleRoot, leaf), "Invalid proof.");
         // Mark address as having claimed their token.
