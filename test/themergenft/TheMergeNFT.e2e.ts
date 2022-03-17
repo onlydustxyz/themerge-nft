@@ -38,7 +38,7 @@ describe("TheMergeNFT", function () {
 
     let claimingAddress;
     let merkleProof;
-    // 1. Claim with whitelisted address.
+    // 1. Claim with whitelisted address and correct proof.
     claimingAddress = leafNodes[0];
     merkleProof = whitelistMerkleTree.getHexProof(claimingAddress);
     await theMergeNFT.connect(this.signers.whitelistedAddress1).whitelistMint(merkleProof);
@@ -48,5 +48,16 @@ describe("TheMergeNFT", function () {
     await expect(theMergeNFT.connect(this.signers.whitelistedAddress1).whitelistMint(merkleProof)).to.be.revertedWith(
       "Address has already claimed.",
     );
+
+    // 3. Cannot claim with a valid proof if sender is not the address used for the proof.
+    claimingAddress = leafNodes[2];
+    merkleProof = whitelistMerkleTree.getHexProof(claimingAddress);
+    await expect(theMergeNFT.connect(this.signers.whitelistedAddress2).whitelistMint(merkleProof)).to.be.revertedWith(
+      "Invalid proof.",
+    );
+
+    // 4. Claim with whitelisted address and correct proof.
+    await theMergeNFT.connect(this.signers.whitelistedAddress3).whitelistMint(merkleProof);
+    expect(await theMergeNFT.balanceOf(this.signers.whitelistedAddress3.address)).to.be.equal(1);
   });
 });
