@@ -42,5 +42,11 @@ describe("TheMergeNFT", function () {
     claimingAddress = leafNodes[0];
     merkleProof = whitelistMerkleTree.getHexProof(claimingAddress);
     await theMergeNFT.connect(this.signers.whitelistedAddress1).whitelistMint(merkleProof);
+    expect(await theMergeNFT.balanceOf(this.signers.whitelistedAddress1.address)).to.be.equal(1);
+
+    // 2. Cannot claim twice.
+    await expect(theMergeNFT.connect(this.signers.whitelistedAddress1).whitelistMint(merkleProof)).to.be.revertedWith(
+      "Address has already claimed.",
+    );
   });
 });
