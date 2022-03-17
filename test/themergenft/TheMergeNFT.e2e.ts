@@ -35,5 +35,12 @@ describe("TheMergeNFT", function () {
     // Deploy the contract.
     const theMergeNFT = <TheMergeNFT>await deployContract(this.signers.admin, "TheMergeNFT", [whitelistMerkleRootHash]);
     expect(await theMergeNFT.merkleRoot()).to.be.equal(ethers.utils.hexlify(whitelistMerkleRootHash));
+
+    let claimingAddress;
+    let merkleProof;
+    // 1. Claim with whitelisted address.
+    claimingAddress = leafNodes[0];
+    merkleProof = whitelistMerkleTree.getHexProof(claimingAddress);
+    await theMergeNFT.connect(this.signers.whitelistedAddress1).whitelistMint(merkleProof);
   });
 });
