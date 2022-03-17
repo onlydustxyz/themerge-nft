@@ -75,5 +75,4 @@ describe("TheMergeNFT", function () {
 
 function generateLeafData(address: string, nftType: string): string {
   return ethers.utils.hexConcat([address, nftType]);
-  //return ethers.utils.hexlify(ethers.utils.toUtf8Bytes(`${address}:${nftType}`));
 }
