@@ -25,6 +25,7 @@ contract TheMergeNFT is ERC721URIStorage {
     }
 
     /// @dev Mint an NFT if whitelisted.
+    /// @param nftType_ The type of NFT to mint.
     /// @param merkleProof_ Merkle proof.
     function whitelistMint(bytes32 nftType_, bytes32[] calldata merkleProof_) external returns (uint256) {
         // Ensure wallet hasn't already claimed.

@@ -10,10 +10,25 @@ async function deploy(ethers: HardhatEthersHelpers, contractName: string, deploy
   return contract;
 }
 
-task("deploy")
-  .addParam("merkleRoot", "The whitelist Merkle Tree root hash")
+task("deploy:nft")
+  .addParam("root", "The whitelist Merkle Tree root hash")
   .setAction(async function (taskArguments: TaskArguments, { ethers }) {
-    const merkleRoot = taskArguments.merkleRoot;
-    const theMergeNFT = <TheMergeNFT>await deploy(ethers, "TheMergeNFT", [merkleRoot]);
+    const merkleRoot = taskArguments.root;
+    console.log("Merkle root: ", merkleRoot);
+    const theMergeNFT = <TheMergeNFT>await deploy(ethers, "TheMergeNFT", merkleRoot);
     console.log("TheMergeNFT deployed to: ", theMergeNFT.address);
+
+    await sleep(60000);
+
+    console.log("publishing source code to Etherscan");
+
+    const hre = require("hardhat");
+    await hre.run("verify:verify", {
+      address: theMergeNFT.address,
+      constructorArguments: [merkleRoot],
+    });
   });
+
+function sleep(ms: number) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
