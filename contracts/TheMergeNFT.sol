@@ -43,10 +43,14 @@ contract TheMergeNFT is ERC1155, Ownable {
         // Mark address as having claimed their token.
         whitelistClaimed[msg.sender] = true;
 
-        for (uint256 i = 0; i < nftTypes_.length; i++) {
-            // Mint NFT.
-            _mint(msg.sender, nftTypes_[i], 1, "");
+        uint256[] memory amounts = new uint256[](nftTypes_.length);
+        uint256[] memory types = new uint256[](nftTypes_.length);
+        for (uint8 i = 0; i < nftTypes_.length; i++) {
+            types[i] = nftTypes_[i];
+            amounts[i] = 1;
         }
+
+        _mintBatch(msg.sender, types, amounts, "");
     }
 
     function _beforeTokenTransfer(
