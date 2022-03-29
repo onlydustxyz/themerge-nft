@@ -28,6 +28,11 @@ describe("TheMergeNFT", function () {
     let leafNodes: string[];
     let whitelistMerkleTree: MerkleTree;
 
+    async function claimTokensAs(address: SignerWithAddress, tokens: string[], node: string) {
+      const merkleProof = whitelistMerkleTree.getHexProof(node);
+      await theMergeNFT.connect(address).whitelistMint(tokens, merkleProof);
+    }
+
     before(function () {
       // Declare the list of whitelisted addresses.
       claims = {
@@ -67,11 +72,11 @@ describe("TheMergeNFT", function () {
       expect(await theMergeNFT.balanceOf(this.signers.whitelistedAddress1.address, TYPE_VALIDATOR)).to.be.equal(0);
 
       // Claim the tokens
-      const claimingNode = leafNodes[0];
-      const merkleProof = whitelistMerkleTree.getHexProof(claimingNode);
-      await theMergeNFT
-        .connect(this.signers.whitelistedAddress1)
-        .whitelistMint(claims[this.signers.whitelistedAddress1.address], merkleProof);
+      await claimTokensAs(
+        this.signers.whitelistedAddress1,
+        claims[this.signers.whitelistedAddress1.address],
+        leafNodes[0],
+      );
 
       // Check that all NFTs have been claimed
       expect(await theMergeNFT.balanceOf(this.signers.whitelistedAddress1.address, TYPE_ACTIVE_WALLET)).to.be.equal(1);
@@ -82,31 +87,21 @@ describe("TheMergeNFT", function () {
     });
 
     it("does not let an address claim the tokens twice", async function () {
-      const claimingNode = leafNodes[0];
-      const merkleProof = whitelistMerkleTree.getHexProof(claimingNode);
       await expect(
-        theMergeNFT
-          .connect(this.signers.whitelistedAddress1)
-          .whitelistMint(claims[this.signers.whitelistedAddress1.address], merkleProof),
+        claimTokensAs(this.signers.whitelistedAddress1, claims[this.signers.whitelistedAddress1.address], leafNodes[0]),
       ).to.be.revertedWith("Address has already claimed.");
     });
 
     it("does not let an address claim tokens with a proof not related to their address", async function () {
-      const claimingNode = leafNodes[2];
-      const merkleProof = whitelistMerkleTree.getHexProof(claimingNode);
       await expect(
-        theMergeNFT
-          .connect(this.signers.whitelistedAddress2)
-          .whitelistMint(claims[this.signers.whitelistedAddress2.address], merkleProof),
+        claimTokensAs(this.signers.whitelistedAddress2, claims[this.signers.whitelistedAddress2.address], leafNodes[2]),
       ).to.be.revertedWith("Invalid proof.");
     });
 
     it("does not let an address claim token types they are not whitelisted for", async function () {
-      const claimingNode = leafNodes[2];
-      const merkleProof = whitelistMerkleTree.getHexProof(claimingNode);
-      await expect(
-        theMergeNFT.connect(this.signers.whitelistedAddress3).whitelistMint([TYPE_VALIDATOR], merkleProof),
-      ).to.be.revertedWith("Invalid proof.");
+      await expect(claimTokensAs(this.signers.whitelistedAddress3, [TYPE_VALIDATOR], leafNodes[2])).to.be.revertedWith(
+        "Invalid proof.",
+      );
     });
   });
 });
