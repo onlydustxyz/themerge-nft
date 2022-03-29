@@ -32,7 +32,7 @@ contract TheMergeNFT is ERC1155, Ownable {
     /// @dev Mint an NFT if whitelisted.
     /// @param nftTypes_ The types of the NFTs to mint.
     /// @param merkleProof_ Merkle proof.
-    function whitelistMint(uint8[] calldata nftTypes_, bytes32[] calldata merkleProof_) external {
+    function whitelistMint(uint256[] calldata nftTypes_, bytes32[] calldata merkleProof_) external {
         // Ensure wallet hasn't already claimed.
         require(!whitelistClaimed[msg.sender], "Address has already claimed.");
         bytes memory data = abi.encodePacked(msg.sender, nftTypes_);
@@ -44,13 +44,11 @@ contract TheMergeNFT is ERC1155, Ownable {
         whitelistClaimed[msg.sender] = true;
 
         uint256[] memory amounts = new uint256[](nftTypes_.length);
-        uint256[] memory types = new uint256[](nftTypes_.length);
         for (uint8 i = 0; i < nftTypes_.length; i++) {
-            types[i] = nftTypes_[i];
             amounts[i] = 1;
         }
 
-        _mintBatch(msg.sender, types, amounts, "");
+        _mintBatch(msg.sender, nftTypes_, amounts, "");
     }
 
     function _beforeTokenTransfer(
