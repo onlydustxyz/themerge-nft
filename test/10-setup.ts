@@ -2,7 +2,7 @@ import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { ethers } from "hardhat";
 import { Impersonations, Mocks, Signers } from "./types";
 
-beforeEach(async function () {
+before(async function () {
   this.signers = {} as Signers;
 
   const signers: SignerWithAddress[] = await ethers.getSigners();
