@@ -48,4 +48,15 @@ contract TheMergeNFT is ERC1155, Ownable {
             _mint(msg.sender, nftTypes_[i], 1, "");
         }
     }
+
+    function _beforeTokenTransfer(
+        address,
+        address from,
+        address,
+        uint256[] memory,
+        uint256[] memory,
+        bytes memory
+    ) internal pure override {
+        require(from == address(0), "Transfers are not allowed");
+    }
 }

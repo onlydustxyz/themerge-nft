@@ -103,6 +103,20 @@ describe("TheMergeNFT", function () {
         "Invalid proof.",
       );
     });
+
+    it("does not let an address transfer their token", async function () {
+      await expect(
+        theMergeNFT
+          .connect(this.signers.whitelistedAddress1)
+          .safeTransferFrom(
+            this.signers.whitelistedAddress1.address,
+            this.signers.whitelistedAddress2.address,
+            TYPE_ACTIVE_WALLET,
+            1,
+            [],
+          ),
+      ).to.be.revertedWith("Transfers are not allowed");
+    });
   });
 });
 
