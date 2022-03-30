@@ -12,10 +12,11 @@ async function deploy(ethers: HardhatEthersHelpers, contractName: string, deploy
 
 task("deploy:nft")
   .addParam("root", "The whitelist Merkle Tree root hash")
+  .addParam("uri", "The public metadata URI")
   .setAction(async function (taskArguments: TaskArguments, { ethers }) {
     const merkleRoot = taskArguments.root;
-    console.log("Merkle root: ", merkleRoot);
-    const theMergeNFT = <TheMergeNFT>await deploy(ethers, "TheMergeNFT", merkleRoot);
+    const publicUri = taskArguments.uri;
+    const theMergeNFT = <TheMergeNFT>await deploy(ethers, "TheMergeNFT", [merkleRoot, publicUri]);
     console.log("TheMergeNFT deployed to: ", theMergeNFT.address);
 
     await sleep(60000);
@@ -25,7 +26,7 @@ task("deploy:nft")
     const hre = require("hardhat");
     await hre.run("verify:verify", {
       address: theMergeNFT.address,
-      constructorArguments: [merkleRoot],
+      constructorArguments: [merkleRoot, publicUri],
     });
   });
 
