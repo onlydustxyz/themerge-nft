@@ -51,6 +51,43 @@ contract TheMergeNFT is ERC1155, Ownable {
         _mintBatch(msg.sender, nftTypes_, amounts, "");
     }
 
+    /// @notice Decompose a provided number into its composing powers of 2
+    /// @dev Iteratively shift the number's binary representation to the right and check for the result parity
+    /// @param number_ The number to decompose
+    /// @return decomposition The array of powers of 2 composing the number
+    function decomposeUint(uint256 number_) public pure returns (uint256[] memory decomposition) {
+        // solhint-disable no-inline-assembly
+        // Assembly is needed here to create a dynamic size array in memory instead of a storage one
+        assembly {
+            let shiftedInput := number_
+            let currentPowerOf2 := 0
+            let decompositionLength := 0
+
+            // solhint-disable no-empty-blocks
+            // This for loop is a while loop in disguise
+            for {
+
+            } gt(shiftedInput, 0) {
+                // Increase the power of 2 by 1 after each iteration
+                currentPowerOf2 := add(1, currentPowerOf2)
+                // Shift the input to the right by 1
+                shiftedInput := shr(1, shiftedInput)
+            } {
+                // Check if the shifted input is odd
+                let parity := mod(shiftedInput, 2)
+                if eq(parity, 1) {
+                    // The shifter input is odd, let's add this power of 2 to the decomposition array
+                    decompositionLength := add(1, decompositionLength)
+                    mstore(add(decomposition, mul(decompositionLength, 0x20)), currentPowerOf2)
+                }
+            }
+            // Set the length of the decomposition array
+            mstore(decomposition, decompositionLength)
+            // Update the free memory pointer according to the decomposition array size
+            mstore(0x40, add(decomposition, mul(add(decompositionLength, 1), 0x20)))
+        }
+    }
+
     function _beforeTokenTransfer(
         address,
         address from,

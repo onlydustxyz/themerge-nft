@@ -55,6 +55,7 @@ describe("TheMergeNFT", function () {
       // Get the root hash of the Merkle Tree.
       whitelistMerkleRootHash = whitelistMerkleTree.getRoot();
     });
+
     it("can be deployed", async function () {
       // Deploy the contract.
       theMergeNFT = <TheMergeNFT>(
@@ -116,6 +117,17 @@ describe("TheMergeNFT", function () {
             [],
           ),
       ).to.be.revertedWith("Transfers are not allowed");
+    });
+
+    it("gives all the powers of 2 of a given number", async function () {
+      {
+        const decomposition = await theMergeNFT.decomposeUint(1236);
+        expect(decomposition.map(bigNumber => bigNumber.toNumber())).to.deep.equal([2, 4, 6, 7, 10]);
+      }
+      {
+        const decomposition = await theMergeNFT.decomposeUint(0);
+        expect(decomposition).to.deep.equal([]);
+      }
     });
   });
 });
