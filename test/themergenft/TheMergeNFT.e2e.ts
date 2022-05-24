@@ -74,6 +74,12 @@ describe("TheMergeNFT", function () {
       expect(await theMergeNFT.merkleRoot()).to.be.equal(ethers.utils.hexlify(whitelistMerkleRootHash));
     });
 
+    it("does not let an address claim their token with an invalid proof", async function () {
+      await expect(
+        claimTokensAs(this.signers.whitelistedAddress1, claims[this.signers.whitelistedAddress1.address], "yolo"),
+      ).to.be.revertedWith("Invalid proof.");
+    });
+
     it("lets whitelisted address claim their tokens", async function () {
       // Address initially has no tokens
       expect(await theMergeNFT.balanceOf(this.signers.whitelistedAddress1.address, TYPE_ACTIVE_WALLET)).to.be.equal(0);
