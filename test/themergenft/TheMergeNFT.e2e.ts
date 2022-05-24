@@ -30,9 +30,10 @@ describe("TheMergeNFT", function () {
     let leafNodes: string[];
     let whitelistMerkleTree: MerkleTree;
 
-    async function claimTokensAs(address: SignerWithAddress, packedTokenIds: number, node: string) {
+    async function claimTokensAs(claimer: SignerWithAddress, packedTokenIds: number, node: string, for_?: string) {
+      for_ = for_ || claimer.address;
       const merkleProof = whitelistMerkleTree.getHexProof(node);
-      await theMergeNFT.connect(address).whitelistMint(packedTokenIds, merkleProof);
+      await theMergeNFT.connect(claimer).mint(packedTokenIds, merkleProof, for_);
     }
 
     before(function () {
@@ -50,12 +51,14 @@ describe("TheMergeNFT", function () {
         ]),
         [this.signers.whitelistedAddress3.address]: packTokenIds([TYPE_ACTIVE_WALLET]),
         [this.signers.whitelistedAddress4.address]: packTokenIds([TYPE_VALIDATOR]),
+        [this.signers.whitelistedAddress5.address]: packTokenIds([TYPE_VALIDATOR]),
       };
       const leaves = [
         generateLeafData(this.signers.whitelistedAddress1.address, claims[this.signers.whitelistedAddress1.address]),
         generateLeafData(this.signers.whitelistedAddress2.address, claims[this.signers.whitelistedAddress2.address]),
         generateLeafData(this.signers.whitelistedAddress3.address, claims[this.signers.whitelistedAddress3.address]),
         generateLeafData(this.signers.whitelistedAddress4.address, claims[this.signers.whitelistedAddress4.address]),
+        generateLeafData(this.signers.whitelistedAddress5.address, claims[this.signers.whitelistedAddress5.address]),
       ];
       // Build leaf nodes from whitelisted addresses.
       leafNodes = leaves.map(leaf => keccak256(leaf));
@@ -133,6 +136,24 @@ describe("TheMergeNFT", function () {
             [],
           ),
       ).to.be.revertedWith("Transfers are not allowed");
+    });
+
+    it("lets the claimer mint an NFT for someone else", async function () {
+      // Addresses initially has no tokens
+      expect(await theMergeNFT.balanceOf(this.signers.nonWhitelistedAddress.address, TYPE_VALIDATOR)).to.be.equal(0);
+      expect(await theMergeNFT.balanceOf(this.signers.whitelistedAddress5.address, TYPE_VALIDATOR)).to.be.equal(0);
+
+      // Claim the tokens
+      await claimTokensAs(
+        this.signers.whitelistedAddress5,
+        claims[this.signers.whitelistedAddress5.address],
+        leafNodes[4],
+        this.signers.nonWhitelistedAddress.address,
+      );
+
+      // Check that all NFTs have been claimed, to the correct address
+      expect(await theMergeNFT.balanceOf(this.signers.nonWhitelistedAddress.address, TYPE_VALIDATOR)).to.be.equal(1);
+      expect(await theMergeNFT.balanceOf(this.signers.whitelistedAddress5.address, TYPE_VALIDATOR)).to.be.equal(0);
     });
   });
 });
