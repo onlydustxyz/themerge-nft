@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: Apache-2.0
 pragma solidity >=0.8.13;
 
-import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
+import "@magicdust/binary-erc1155/contracts/BinaryERC1155.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 
 /// @title TheMergeNFT
 /// @author abdelhamidbakhta
-contract TheMergeNFT is ERC1155, Ownable {
+contract TheMergeNFT is BinaryERC1155, Ownable {
     // Token ids constants
     uint256 public constant ACTIVE_WALLET = 0;
     uint256 public constant VALIDATOR = 1;
@@ -19,7 +19,7 @@ contract TheMergeNFT is ERC1155, Ownable {
     // mapping variable to mark whitelist addresses as having claimed.
     mapping(address => bool) public whitelistClaimed;
 
-    constructor(bytes32 merkleRoot_, string memory uri) ERC1155(uri) {
+    constructor(bytes32 merkleRoot_, string memory uri) BinaryERC1155(uri) {
         merkleRoot = merkleRoot_;
     }
 
@@ -29,13 +29,14 @@ contract TheMergeNFT is ERC1155, Ownable {
         _setURI(newUri_);
     }
 
-    /// @dev Mint an NFT if whitelisted.
-    /// @param nftTypes_ The types of the NFTs to mint.
+    /// @dev Mint some NFTs if whitelisted.
+    /// @param tokenIds_ The packed types of NFTs to mint.
     /// @param merkleProof_ Merkle proof.
-    function whitelistMint(uint256[] calldata nftTypes_, bytes32[] calldata merkleProof_) external {
+    function whitelistMint(uint256 tokenIds_, bytes32[] calldata merkleProof_) external {
+        require(tokenIds_ > 0, "No token ids provided");
         // Ensure wallet hasn't already claimed.
-        require(!whitelistClaimed[msg.sender], "Address has already claimed.");
-        bytes memory data = abi.encodePacked(msg.sender, nftTypes_);
+        require(!whitelistClaimed[msg.sender], "Address has already claimed their tokens.");
+        bytes memory data = abi.encodePacked(msg.sender, tokenIds_);
         bytes32 leaf = keccak256(data);
 
         // Verify the provider merkle proof.
@@ -43,12 +44,7 @@ contract TheMergeNFT is ERC1155, Ownable {
         // Mark address as having claimed their token.
         whitelistClaimed[msg.sender] = true;
 
-        uint256[] memory amounts = new uint256[](nftTypes_.length);
-        for (uint8 i = 0; i < nftTypes_.length; i++) {
-            amounts[i] = 1;
-        }
-
-        _mintBatch(msg.sender, nftTypes_, amounts, "");
+        _mintBatch(msg.sender, tokenIds_, "");
     }
 
     function _beforeTokenTransfer(

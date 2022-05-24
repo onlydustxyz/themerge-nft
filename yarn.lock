@@ -906,6 +906,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@magicdust/binary-erc1155@npm:^1.0.1":
+  version: 1.0.1
+  resolution: "@magicdust/binary-erc1155@npm:1.0.1"
+  checksum: 1ff8222e00a54b47b575795110cd0895211ac2f419026619d307e0a8b4c7d42436a79b851fb412522d5507b5ed0ad23041e93628ef19fa9abadb940581259bc4
+  languageName: node
+  linkType: hard
+
 "@metamask/eth-sig-util@npm:^4.0.0":
   version: 4.0.0
   resolution: "@metamask/eth-sig-util@npm:4.0.0"
@@ -1008,10 +1015,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@openzeppelin/contracts@npm:^4.5.0":
-  version: 4.5.0
-  resolution: "@openzeppelin/contracts@npm:4.5.0"
-  checksum: 1c9c5dff041905771d2a83ac29c64dbf0b48603de43f74a34fb1358813d7c7bf259efe2f64e2112b410c5cca7a0b41aaedd882368be5f01a6d50a3ee0740f962
+"@openzeppelin/contracts@npm:^4.6.0-rc.0 ":
+  version: 4.6.0-rc.0
+  resolution: "@openzeppelin/contracts@npm:4.6.0-rc.0"
+  checksum: 7dc37da9790bb45aadc57c2d600d13f3ee739483c4047812157f955831c611447eb4f2afd5e2380fedc934227c3f1da44c18e50a1068a6e3106f4c2eb203c2e5
   languageName: node
   linkType: hard
 
@@ -14308,10 +14315,11 @@ __metadata:
     "@ethersproject/bignumber": ^5.5.0
     "@ethersproject/bytes": ^5.5.0
     "@ethersproject/providers": ^5.5.3
+    "@magicdust/binary-erc1155": ^1.0.1
     "@nomiclabs/hardhat-ethers": ^2.0.4
     "@nomiclabs/hardhat-etherscan": ^3.0.3
     "@nomiclabs/hardhat-waffle": ^2.0.2
-    "@openzeppelin/contracts": ^4.5.0
+    "@openzeppelin/contracts": "^4.6.0-rc.0 "
     "@typechain/ethers-v5": ^9.0.0
     "@typechain/hardhat": ^4.0.0
     "@types/chai": ^4.3.0

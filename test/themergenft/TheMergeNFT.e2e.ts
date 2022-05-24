@@ -6,7 +6,6 @@ import { TheMergeNFT } from "../../src/types/TheMergeNFT";
 import { MerkleTree } from "merkletreejs";
 import {} from "keccak256";
 import { keccak256 } from "ethers/lib/utils";
-import { BigNumber } from "ethers";
 
 async function deployContract(signer: SignerWithAddress, artifactName: string, args?: unknown[]) {
   const artifact: Artifact = await artifacts.readArtifact(artifactName);
@@ -15,31 +14,42 @@ async function deployContract(signer: SignerWithAddress, artifactName: string, a
   return contract;
 }
 
+const TYPE_ACTIVE_WALLET = 0;
+const TYPE_VALIDATOR = 1;
+const TYPE_SLASHED_VALIDATOR = 2;
+
+const packTokenIds = (tokenIds: number[]): number => tokenIds.reduce((acc, tokenId) => acc + 2 ** tokenId, 0);
+
 describe("TheMergeNFT", function () {
-  const TYPE_ACTIVE_WALLET = ethers.utils.hexZeroPad(ethers.utils.hexlify(0), 32);
-  const TYPE_VALIDATOR = ethers.utils.hexZeroPad(ethers.utils.hexlify(1), 32);
-  const TYPE_SLASHED_VALIDATOR = ethers.utils.hexZeroPad(ethers.utils.hexlify(2), 32);
   const BASE_URI = "https://example/api/item/{id}.json";
 
   describe("in an end-to-end scenario", function () {
-    let claims: { [address: string]: string[] };
+    let claims: { [address: string]: number };
     let whitelistMerkleRootHash: Buffer;
     let theMergeNFT: TheMergeNFT;
     let leafNodes: string[];
     let whitelistMerkleTree: MerkleTree;
 
-    async function claimTokensAs(address: SignerWithAddress, tokens: string[], node: string) {
+    async function claimTokensAs(address: SignerWithAddress, packedTokenIds: number, node: string) {
       const merkleProof = whitelistMerkleTree.getHexProof(node);
-      await theMergeNFT.connect(address).whitelistMint(tokens, merkleProof);
+      await theMergeNFT.connect(address).whitelistMint(packedTokenIds, merkleProof);
     }
 
     before(function () {
       // Declare the list of whitelisted addresses.
       claims = {
-        [this.signers.whitelistedAddress1.address]: [TYPE_ACTIVE_WALLET, TYPE_VALIDATOR, TYPE_SLASHED_VALIDATOR],
-        [this.signers.whitelistedAddress2.address]: [TYPE_ACTIVE_WALLET, TYPE_VALIDATOR, TYPE_SLASHED_VALIDATOR],
-        [this.signers.whitelistedAddress3.address]: [TYPE_ACTIVE_WALLET],
-        [this.signers.whitelistedAddress4.address]: [TYPE_VALIDATOR],
+        [this.signers.whitelistedAddress1.address]: packTokenIds([
+          TYPE_ACTIVE_WALLET,
+          TYPE_VALIDATOR,
+          TYPE_SLASHED_VALIDATOR,
+        ]),
+        [this.signers.whitelistedAddress2.address]: packTokenIds([
+          TYPE_ACTIVE_WALLET,
+          TYPE_VALIDATOR,
+          TYPE_SLASHED_VALIDATOR,
+        ]),
+        [this.signers.whitelistedAddress3.address]: packTokenIds([TYPE_ACTIVE_WALLET]),
+        [this.signers.whitelistedAddress4.address]: packTokenIds([TYPE_VALIDATOR]),
       };
       const leaves = [
         generateLeafData(this.signers.whitelistedAddress1.address, claims[this.signers.whitelistedAddress1.address]),
@@ -55,6 +65,7 @@ describe("TheMergeNFT", function () {
       // Get the root hash of the Merkle Tree.
       whitelistMerkleRootHash = whitelistMerkleTree.getRoot();
     });
+
     it("can be deployed", async function () {
       // Deploy the contract.
       theMergeNFT = <TheMergeNFT>(
@@ -89,7 +100,7 @@ describe("TheMergeNFT", function () {
     it("does not let an address claim the tokens twice", async function () {
       await expect(
         claimTokensAs(this.signers.whitelistedAddress1, claims[this.signers.whitelistedAddress1.address], leafNodes[0]),
-      ).to.be.revertedWith("Address has already claimed.");
+      ).to.be.revertedWith("Address has already claimed their tokens.");
     });
 
     it("does not let an address claim tokens with a proof not related to their address", async function () {
@@ -99,9 +110,9 @@ describe("TheMergeNFT", function () {
     });
 
     it("does not let an address claim token types they are not whitelisted for", async function () {
-      await expect(claimTokensAs(this.signers.whitelistedAddress3, [TYPE_VALIDATOR], leafNodes[2])).to.be.revertedWith(
-        "Invalid proof.",
-      );
+      await expect(
+        claimTokensAs(this.signers.whitelistedAddress3, packTokenIds([TYPE_SLASHED_VALIDATOR]), leafNodes[2]),
+      ).to.be.revertedWith("Invalid proof.");
     });
 
     it("does not let an address transfer their token", async function () {
@@ -120,6 +131,6 @@ describe("TheMergeNFT", function () {
   });
 });
 
-function generateLeafData(address: string, nftTypes: string[]): string {
-  return ethers.utils.hexConcat([address, ...nftTypes]);
+function generateLeafData(address: string, packedTokenIds: number): string {
+  return ethers.utils.hexConcat([address, ethers.utils.hexZeroPad(ethers.utils.hexlify(packedTokenIds), 32)]);
 }
