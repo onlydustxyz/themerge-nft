@@ -31,8 +31,14 @@ contract TheMergeNFT is BinaryERC1155, Ownable {
 
     /// @dev Mint some NFTs if whitelisted.
     /// @param tokenIds_ The packed types of NFTs to mint.
-    /// @param merkleProof_ Merkle proof.
-    function whitelistMint(uint256 tokenIds_, bytes32[] calldata merkleProof_) external {
+    /// @param whiteListMerkleProof_ Merkle proof.
+    /// @param for_ The address to mint the NFTs for
+    function mint(
+        uint256 tokenIds_,
+        bytes32[] calldata whiteListMerkleProof_,
+        address for_
+    ) external {
+        require(for_ != address(0), "NFTs receiver must be a valid address");
         require(tokenIds_ > 0, "No token ids provided");
         // Ensure wallet hasn't already claimed.
         require(!whitelistClaimed[msg.sender], "Address has already claimed their tokens.");
@@ -40,11 +46,11 @@ contract TheMergeNFT is BinaryERC1155, Ownable {
         bytes32 leaf = keccak256(data);
 
         // Verify the provider merkle proof.
-        require(MerkleProof.verify(merkleProof_, merkleRoot, leaf), "Invalid proof.");
+        require(MerkleProof.verify(whiteListMerkleProof_, merkleRoot, leaf), "Invalid proof.");
         // Mark address as having claimed their token.
         whitelistClaimed[msg.sender] = true;
 
-        _mintBatch(msg.sender, tokenIds_, "");
+        _mintBatch(for_, tokenIds_, "");
     }
 
     function _beforeTokenTransfer(
