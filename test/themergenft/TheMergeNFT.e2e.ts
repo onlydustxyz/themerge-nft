@@ -14,9 +14,14 @@ async function deployContract(signer: SignerWithAddress, artifactName: string, a
   return contract;
 }
 
-const TYPE_ACTIVE_WALLET = 0;
-const TYPE_VALIDATOR = 1;
-const TYPE_SLASHED_VALIDATOR = 2;
+const TYPE_ONE_TRANSACTION = 0;
+const TYPE_ONE_HUNDRED_TRANSACTIONS = 1;
+const TYPE_DEPLOYMENT = 2;
+const TYPE_TEN_DEPLOYMENTS = 3;
+const TYPE_HUNDRED_DEPLOYMENTS = 4;
+const TYPE_TEN_CALLS_TEN_CONTRACTS = 5;
+const TYPE_VALIDATOR = 6;
+const TYPE_SLASHED_VALIDATOR = 7;
 
 const packTokenIds = (tokenIds: number[]): number => tokenIds.reduce((acc, tokenId) => acc + 2 ** tokenId, 0);
 
@@ -40,16 +45,16 @@ describe("TheMergeNFT", function () {
       // Declare the list of whitelisted addresses.
       claims = {
         [this.signers.whitelistedAddress1.address]: packTokenIds([
-          TYPE_ACTIVE_WALLET,
+          TYPE_ONE_TRANSACTION,
           TYPE_VALIDATOR,
           TYPE_SLASHED_VALIDATOR,
         ]),
         [this.signers.whitelistedAddress2.address]: packTokenIds([
-          TYPE_ACTIVE_WALLET,
+          TYPE_ONE_TRANSACTION,
           TYPE_VALIDATOR,
           TYPE_SLASHED_VALIDATOR,
         ]),
-        [this.signers.whitelistedAddress3.address]: packTokenIds([TYPE_ACTIVE_WALLET]),
+        [this.signers.whitelistedAddress3.address]: packTokenIds([TYPE_ONE_TRANSACTION]),
         [this.signers.whitelistedAddress4.address]: packTokenIds([TYPE_VALIDATOR]),
         [this.signers.whitelistedAddress5.address]: packTokenIds([TYPE_VALIDATOR]),
       };
@@ -85,7 +90,9 @@ describe("TheMergeNFT", function () {
 
     it("lets whitelisted address claim their tokens", async function () {
       // Address initially has no tokens
-      expect(await theMergeNFT.balanceOf(this.signers.whitelistedAddress1.address, TYPE_ACTIVE_WALLET)).to.be.equal(0);
+      expect(await theMergeNFT.balanceOf(this.signers.whitelistedAddress1.address, TYPE_ONE_TRANSACTION)).to.be.equal(
+        0,
+      );
       expect(await theMergeNFT.balanceOf(this.signers.whitelistedAddress1.address, TYPE_SLASHED_VALIDATOR)).to.be.equal(
         0,
       );
@@ -99,7 +106,9 @@ describe("TheMergeNFT", function () {
       );
 
       // Check that all NFTs have been claimed
-      expect(await theMergeNFT.balanceOf(this.signers.whitelistedAddress1.address, TYPE_ACTIVE_WALLET)).to.be.equal(1);
+      expect(await theMergeNFT.balanceOf(this.signers.whitelistedAddress1.address, TYPE_ONE_TRANSACTION)).to.be.equal(
+        1,
+      );
       expect(await theMergeNFT.balanceOf(this.signers.whitelistedAddress1.address, TYPE_SLASHED_VALIDATOR)).to.be.equal(
         1,
       );
@@ -131,7 +140,7 @@ describe("TheMergeNFT", function () {
           .safeTransferFrom(
             this.signers.whitelistedAddress1.address,
             this.signers.whitelistedAddress2.address,
-            TYPE_ACTIVE_WALLET,
+            TYPE_ONE_TRANSACTION,
             1,
             [],
           ),

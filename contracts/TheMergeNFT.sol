@@ -9,9 +9,14 @@ import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 /// @author abdelhamidbakhta
 contract TheMergeNFT is BinaryERC1155, Ownable {
     // Token ids constants
-    uint256 public constant ACTIVE_WALLET = 0;
-    uint256 public constant VALIDATOR = 1;
-    uint256 public constant SLASHED_VALIDATOR = 2;
+    uint256 public constant ONE_TRANSACTION = 0;
+    uint256 public constant ONE_HUNDRED_TRANSACTIONS = 1;
+    uint256 public constant DEPLOYMENT = 2;
+    uint256 public constant TEN_DEPLOYMENTS = 3;
+    uint256 public constant HUNDRED_DEPLOYMENTS = 4;
+    uint256 public constant TEN_CALLS_TEN_CONTRACTS = 5;
+    uint256 public constant VALIDATOR = 6;
+    uint256 public constant SLASHED_VALIDATOR = 7;
 
     // Root hash of the whitelist Merkle Tree.
     bytes32 public merkleRoot;
