@@ -98,7 +98,13 @@ $ yarn clean
 Deploy the contracts to Hardhat Network:
 
 ```sh
-$ yarn deploy
+$ yarn deploy --root [merkelRoot] --uri [tokenUri]
+```
+
+Deploy the contracts to localhost Network:
+
+```sh
+$ yarn deploy --network localhost --root [merkelRoot] --uri [tokenUri]
 ```
 
 ## Syntax Highlighting
