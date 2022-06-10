@@ -46,14 +46,14 @@ contract TheMergeNFT is BinaryERC1155, Ownable {
         require(for_ != address(0), "NFTs receiver must be a valid address");
         require(tokenIds_ > 0, "No token ids provided");
         // Ensure wallet hasn't already claimed.
-        require(!whitelistClaimed[msg.sender], "Address has already claimed their tokens.");
-        bytes memory data = abi.encodePacked(msg.sender, tokenIds_);
+        require(!whitelistClaimed[for_], "Address has already claimed their tokens.");
+        bytes memory data = abi.encodePacked(for_, tokenIds_);
         bytes32 leaf = keccak256(data);
 
         // Verify the provider merkle proof.
         require(MerkleProof.verify(whiteListMerkleProof_, merkleRoot, leaf), "Invalid proof.");
         // Mark address as having claimed their token.
-        whitelistClaimed[msg.sender] = true;
+        whitelistClaimed[for_] = true;
 
         _mintBatch(for_, tokenIds_, "");
     }

@@ -57,6 +57,7 @@ describe("TheMergeNFT", function () {
         [this.signers.whitelistedAddress3.address]: packTokenIds([TYPE_ONE_TRANSACTION]),
         [this.signers.whitelistedAddress4.address]: packTokenIds([TYPE_VALIDATOR]),
         [this.signers.whitelistedAddress5.address]: packTokenIds([TYPE_VALIDATOR]),
+        [this.signers.whitelistedAddress6.address]: packTokenIds([TYPE_VALIDATOR]),
       };
       const leaves = [
         generateLeafData(this.signers.whitelistedAddress1.address, claims[this.signers.whitelistedAddress1.address]),
@@ -64,6 +65,7 @@ describe("TheMergeNFT", function () {
         generateLeafData(this.signers.whitelistedAddress3.address, claims[this.signers.whitelistedAddress3.address]),
         generateLeafData(this.signers.whitelistedAddress4.address, claims[this.signers.whitelistedAddress4.address]),
         generateLeafData(this.signers.whitelistedAddress5.address, claims[this.signers.whitelistedAddress5.address]),
+        generateLeafData(this.signers.whitelistedAddress6.address, claims[this.signers.whitelistedAddress6.address]),
       ];
       // Build leaf nodes from whitelisted addresses.
       leafNodes = leaves.map(leaf => keccak256(leaf));
@@ -147,22 +149,33 @@ describe("TheMergeNFT", function () {
       ).to.be.revertedWith("Transfers are not allowed");
     });
 
-    it("lets the claimer mint an NFT for someone else", async function () {
+    it("lets the claimer mint an NFT for another whitelisted address", async function () {
       // Addresses initially has no tokens
       expect(await theMergeNFT.balanceOf(this.signers.nonWhitelistedAddress.address, TYPE_VALIDATOR)).to.be.equal(0);
       expect(await theMergeNFT.balanceOf(this.signers.whitelistedAddress5.address, TYPE_VALIDATOR)).to.be.equal(0);
 
       // Claim the tokens
       await claimTokensAs(
-        this.signers.whitelistedAddress5,
+        this.signers.nonWhitelistedAddress,
         claims[this.signers.whitelistedAddress5.address],
         leafNodes[4],
-        this.signers.nonWhitelistedAddress.address,
+        this.signers.whitelistedAddress5.address,
       );
 
       // Check that all NFTs have been claimed, to the correct address
-      expect(await theMergeNFT.balanceOf(this.signers.nonWhitelistedAddress.address, TYPE_VALIDATOR)).to.be.equal(1);
-      expect(await theMergeNFT.balanceOf(this.signers.whitelistedAddress5.address, TYPE_VALIDATOR)).to.be.equal(0);
+      expect(await theMergeNFT.balanceOf(this.signers.nonWhitelistedAddress.address, TYPE_VALIDATOR)).to.be.equal(0);
+      expect(await theMergeNFT.balanceOf(this.signers.whitelistedAddress5.address, TYPE_VALIDATOR)).to.be.equal(1);
+    });
+
+    it("does not let the claimer mint an NFT for a nonwhitelisted address", async function () {
+      await expect(
+        claimTokensAs(
+          this.signers.whitelistedAddress6,
+          claims[this.signers.whitelistedAddress6.address],
+          leafNodes[4],
+          this.signers.nonWhitelistedAddress.address,
+        ),
+      ).to.be.revertedWith("Invalid proof.");
     });
   });
 });
