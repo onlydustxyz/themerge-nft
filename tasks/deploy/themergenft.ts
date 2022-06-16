@@ -5,7 +5,7 @@ import { TheMergeNFT } from "../../src/types/TheMergeNFT";
 
 async function deploy(ethers: HardhatEthersHelpers, contractName: string, deploymentArgs?: unknown[] | undefined) {
   const factory = await ethers.getContractFactory(contractName);
-  const contract = await factory.deploy(deploymentArgs);
+  const contract = await factory.deploy.apply(factory, Array.isArray(deploymentArgs) ? deploymentArgs : []);
   await contract.deployed();
   return contract;
 }
