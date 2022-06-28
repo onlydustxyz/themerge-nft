@@ -1,22 +1,12 @@
 import { expect } from "chai";
-import {
-  generateWhitelistMerkleTree,
-  getMerkleRoot,
-  readWhitelist,
-  unpackNftTypes,
-  WhiteList,
-} from "../tasks/merkle-root";
+import { generateWhitelistMerkleTree, getMerkleRoot } from "../tasks/merkle-root";
+import { readWhitelist, WhiteList } from "../tasks/whitelist-reader";
 
 describe("The merkle root computation", () => {
-  it("decomposes the packed NFT types from the whitelist", async () => {
-    const packedNftTypes = parseInt("0xf", 16);
-    const nftTypes = unpackNftTypes(packedNftTypes);
-
-    expect(nftTypes).to.deep.equal([0, 1, 2, 3]);
-  });
-
   it("generates a merkle tree from a simple whitelist", async () => {
-    const whitelist: WhiteList = [{ address: "0x2c9758BDe2DBc7F6a259a5826a85761FcE322708", packedTypes: 0xf }];
+    const whitelist: WhiteList = [
+      { address: "0x2c9758BDe2DBc7F6a259a5826a85761FcE322708", nftTypes: [0, 1, 2, 3, 4, 5, 6] },
+    ];
     const merkleTree = generateWhitelistMerkleTree(whitelist);
 
     expect(merkleTree.getDepth()).to.equal(0);
