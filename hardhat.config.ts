@@ -10,6 +10,7 @@ import "hardhat-tracer";
 import "./tasks/accounts";
 import "./tasks/deploy";
 import "./tasks/merkle-root";
+import "./tasks/claimable-nft-types";
 
 import { resolve } from "path";
 
