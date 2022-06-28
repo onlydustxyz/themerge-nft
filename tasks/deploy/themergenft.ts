@@ -19,9 +19,10 @@ task("deploy:nft")
     const theMergeNFT = <TheMergeNFT>await deploy(ethers, "TheMergeNFT", [merkleRoot, publicUri]);
     console.log("TheMergeNFT deployed to: ", theMergeNFT.address);
 
+    console.log("Now waiting one minute for the contract to be deployed in order to verify it on Etherscan afterwards");
     await sleep(60000);
 
-    console.log("publishing source code to Etherscan");
+    console.log("Publishing source code to Etherscan");
 
     const hre = require("hardhat");
     await hre.run("verify:verify", {

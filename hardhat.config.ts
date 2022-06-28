@@ -9,6 +9,7 @@ import "hardhat-tracer";
 
 import "./tasks/accounts";
 import "./tasks/deploy";
+import "./tasks/merkle-root";
 
 import { resolve } from "path";
 
