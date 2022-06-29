@@ -1,10 +1,10 @@
 {
   "name": "themerge-nft",
   "description": "Let's celebrate the end of proof-of-work for Ethereum, and the full transition to proof-of-stake.",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "author": {
-    "name": "Abdelhamid Bakhta",
-    "url": "https://github.com/abdelhamidbakhta"
+    "name": "OnlyDust",
+    "url": "https://github.com/onlydustxyz"
   },
   "devDependencies": {
     "@codechecks/client": "^0.1.12",
