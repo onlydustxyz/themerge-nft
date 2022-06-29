@@ -2,6 +2,7 @@ import { task } from "hardhat/config";
 import { TaskArguments } from "hardhat/types";
 import { HardhatEthersHelpers } from "@nomiclabs/hardhat-ethers/types";
 import { TheMergeNFT } from "../../src/types/TheMergeNFT";
+import { getMerkleRoot } from "../merkle-root";
 
 async function deploy(ethers: HardhatEthersHelpers, contractName: string, deploymentArgs?: unknown[] | undefined) {
   const factory = await ethers.getContractFactory(contractName);
@@ -11,11 +12,12 @@ async function deploy(ethers: HardhatEthersHelpers, contractName: string, deploy
 }
 
 task("deploy:nft")
-  .addParam("root", "The whitelist Merkle Tree root hash")
+  .addParam("whitelist", "The whitelist path")
   .addParam("uri", "The public metadata URI")
   .setAction(async function (taskArguments: TaskArguments, { ethers }) {
-    const merkleRoot = taskArguments.root;
+    const whitelistPath = taskArguments.whitelist;
     const publicUri = taskArguments.uri;
+    const merkleRoot = await getMerkleRoot(whitelistPath);
     const theMergeNFT = <TheMergeNFT>await deploy(ethers, "TheMergeNFT", [merkleRoot, publicUri]);
     console.log("TheMergeNFT deployed to: ", theMergeNFT.address);
 
