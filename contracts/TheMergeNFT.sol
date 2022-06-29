@@ -6,6 +6,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 
 /// @title TheMergeNFT
+/// @author OnlyDust
 contract TheMergeNFT is BinaryERC1155, Ownable {
     // Token ids constants
     uint256 public constant ONE_TRANSACTION = 0;
