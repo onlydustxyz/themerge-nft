@@ -13,7 +13,7 @@ contract TheMergeNFT is BinaryERC1155, Ownable {
     uint256 public constant ONE_HUNDRED_TRANSACTIONS = 1;
     uint256 public constant DEPLOYMENT = 2;
     uint256 public constant TEN_DEPLOYMENTS = 3;
-    uint256 public constant FIFTY_DEPLOYMENTS = 4;
+    uint256 public constant ONE_HUNDRED_DEPLOYMENTS = 4;
     uint256 public constant TEN_CALLS_TEN_CONTRACTS = 5;
     uint256 public constant VALIDATOR = 6;
     uint256 public constant SLASHED_VALIDATOR = 7;
