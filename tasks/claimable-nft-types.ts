@@ -7,7 +7,7 @@ const nftTypesNames = [
   "do_100_tansactions",
   "deploy_contract",
   "deploy_10_contract",
-  "deploy_50_contract",
+  "deploy_100_contract",
   "do_10_transactions_to_10_contracts",
   "become_validator",
   "slashed_validator",
