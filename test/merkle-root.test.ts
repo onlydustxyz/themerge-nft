@@ -4,9 +4,7 @@ import { readWhitelist, WhiteList } from "../tasks/whitelist-reader";
 
 describe("The merkle root computation", () => {
   it("generates a merkle tree from a simple whitelist", async () => {
-    const whitelist: WhiteList = [
-      { address: "0x2c9758BDe2DBc7F6a259a5826a85761FcE322708", nftTypes: [0, 1, 2, 3, 4, 5, 6] },
-    ];
+    const whitelist: WhiteList = [{ address: "0x2c9758BDe2DBc7F6a259a5826a85761FcE322708", packedTypes: 127 }];
     const merkleTree = generateWhitelistMerkleTree(whitelist);
 
     expect(merkleTree.getDepth()).to.equal(0);
@@ -22,6 +20,6 @@ describe("The merkle root computation", () => {
     expect(merkleTree.getLeafCount()).to.equal(3);
 
     const merkleRoot = await getMerkleRoot(fixtureWhitelistPath);
-    expect(merkleRoot).to.equal("0x1231ef97f498d2021769f00cd842695f991d0144d798c8d7c3e11c860f4a68cf");
+    expect(merkleRoot).to.equal("0xe1950381f472e73ce3626ab355b2619c65385a8b14806c13bfd622e5ef0fe66c");
   });
 });

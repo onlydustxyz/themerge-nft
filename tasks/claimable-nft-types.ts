@@ -1,6 +1,6 @@
 import { task } from "hardhat/config";
 import { TaskArguments } from "hardhat/types";
-import { readWhitelist } from "./whitelist-reader";
+import { readWhitelist, unpackNftTypes } from "./whitelist-reader";
 
 const nftTypesNames = [
   "do_one_transaction",
@@ -24,6 +24,6 @@ task("claimable-nft-types", "Reads from the whitelist to list claimable NFT type
     if (!claimableNftTypes) {
       throw new Error(`No whitelist entry found for address ${candidateAddress}`);
     }
-    const claimableNames = claimableNftTypes.nftTypes.map(nftType => nftTypesNames[nftType]);
+    const claimableNames = unpackNftTypes(claimableNftTypes.packedTypes).map(nftType => nftTypesNames[nftType]);
     console.log("Claimable NFT types: ", claimableNames);
   });
