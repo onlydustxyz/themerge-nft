@@ -40,14 +40,10 @@ if (!infuraApiKey) {
   throw new Error("Please set your INFURA_API_KEY in a .env file");
 }
 
-function getChainConfig(network: keyof typeof chainIds): NetworkUserConfig {
+function getChainConfig(network: keyof typeof chainIds): any {
   const url: string = "https://" + network + ".infura.io/v3/" + infuraApiKey;
   return {
-    accounts: {
-      count: 10,
-      mnemonic,
-      path: "m/44'/60'/0'/0",
-    },
+    accounts: [mnemonic],
     chainId: chainIds[network],
     url,
   };
@@ -68,6 +64,7 @@ const config: HardhatUserConfig = {
       },
       chainId: chainIds.hardhat,
     },
+    mainnet: getChainConfig("mainnet"),
     goerli: getChainConfig("goerli"),
     kovan: getChainConfig("kovan"),
     rinkeby: getChainConfig("rinkeby"),
