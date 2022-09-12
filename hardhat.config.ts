@@ -11,6 +11,7 @@ import "./tasks/accounts";
 import "./tasks/deploy";
 import "./tasks/merkle-root";
 import "./tasks/claimable-nft-types";
+import "./tasks/set-token-uri";
 
 import { resolve } from "path";
 
